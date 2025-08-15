@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "cryptalk-provisioner": "StartDebugging",
+        "cryptalk-provisioner.database": "StartWithoutDebugging",
+        "cryptalk-provisioner.migration": "StartDebugging"
+      }
+    }
+  }
+}

@@ -1,0 +1,45 @@
+services:
+  cryptalk-provisioner:
+    image: ${DOCKER_REGISTRY-}cryptalkprovisioner
+    build:
+      context: .
+      dockerfile: Cryptalk-Provisioner/Dockerfile
+      target: final
+    depends_on:
+      - cryptalk-provisioner.database
+    env_file:
+      - .env
+    environment:
+      ConnectionStrings__Default: "${ConnectionStrings__Default}"
+      BaseDomain: "${BaseDomain}"
+      SubPrefix: "${SubPrefix}"
+      AuthKey: "${AuthKey}"
+      Cloudflare__ApiToken: "${Cloudflare__ApiToken}"
+      Cloudflare__ZoneId: "${Cloudflare__ZoneId}"
+      ASPNETCORE_URLS: "${ASPNETCORE_URLS}"
+    ports:
+      - "${API_PORT}:${API_PORT}"
+
+  cryptalk-provisioner.database:
+    image: postgres:latest
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+    volumes:
+      - ./.containers/cryptalk-provisioner-db:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+
+  cryptalk-provisioner.migration:
+    build:
+      context: .
+      dockerfile: Cryptalk-Provisioner/Dockerfile
+      target: migrator
+    env_file:
+      - .env
+    depends_on:
+      - cryptalk-provisioner.database
+    restart: "no"
